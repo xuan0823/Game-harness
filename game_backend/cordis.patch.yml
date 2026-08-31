@@ -1,0 +1,8 @@
+- id: mcp-chongzhen
+  name: '@deepseek-ai/dsh-mcp-client'
+  config:
+    serverName: chongzhen
+    transport: stdio
+    command: !!js process.cwd() + '/game_backend/venv/Scripts/python.exe'
+    args: ['mcp_stdio_server.py']
+    cwd: !!js process.cwd() + '/game_backend'
