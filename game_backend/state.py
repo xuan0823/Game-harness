@@ -1,7 +1,8 @@
 import json
 import os
 import shutil
-import fcntl if os.name != 'nt' else None
+if os.name != 'nt':
+    import fcntl
 
 STATE_FILE = "state.json"
 SAVES_DIR = "saves"

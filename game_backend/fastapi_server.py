@@ -79,7 +79,8 @@ async def chat_minister(request: Request):
         dsh_home=DSH_HOME,
         cwd=WORKSPACE_CWD,
         profile="sdk",
-        patches=(PATCH_FILE,)
+        patches=(PATCH_FILE,),
+        dsh_bin="node --import tsx/esm apps/cli/src/bin.ts"
     ) as harness:
         # 使用特定的大臣 session ID，让模型缓存前缀
         result = harness.run(
@@ -129,7 +130,8 @@ async def submit_edicts(request: Request):
         dsh_home=DSH_HOME,
         cwd=WORKSPACE_CWD,
         profile="sdk",
-        patches=(PATCH_FILE,)
+        patches=(PATCH_FILE,),
+        dsh_bin="node --import tsx/esm apps/cli/src/bin.ts"
     ) as harness:
         result = harness.run(
             prompt,
