@@ -1,8 +1,13 @@
 import json
 import os
+import shutil
 import fcntl if os.name != 'nt' else None
 
 STATE_FILE = "state.json"
+SAVES_DIR = "saves"
+
+if not os.path.exists(SAVES_DIR):
+    os.makedirs(SAVES_DIR)
 
 PROVINCES = [
     "北直隶", "南直隶", "山东", "山西", "河南", "陕西",
@@ -35,7 +40,7 @@ def _init_provinces():
             "food": 100000,
             "tax_revenue": 500000 if p not in ["陕西", "辽东"] else 0,
             "rebel_risk": rebel_risk,
-            "troops": [] # 驻扎在该省的军队ID
+            "troops": []
         }
     return provinces
 
@@ -51,10 +56,15 @@ DEFAULT_STATE = {
         "army_3": {"id": "army_3", "name": "京营", "location": "北直隶", "count": 100000, "morale": 40, "combat_power": 40}
     },
     "factions": {
-        "东林党": 40,
-        "阉党": 20,
-        "武将集团": 50,
-        "勋贵": 60
+        "东林党": {"loyalty": 40, "influence": 60},
+        "阉党": {"loyalty": 20, "influence": 40},
+        "武将集团": {"loyalty": 50, "influence": 70},
+        "勋贵": {"loyalty": 60, "influence": 50}
+    },
+    "ministers": {
+        "孙承宗": {"name": "孙承宗", "faction": "东林党", "title": "兵部尚书", "loyalty": 90, "chat_history": []},
+        "温体仁": {"name": "温体仁", "faction": "阉党", "title": "内阁首辅", "loyalty": 60, "chat_history": []},
+        "袁崇焕": {"name": "袁崇焕", "faction": "武将集团", "title": "蓟辽督师", "loyalty": 80, "chat_history": []},
     },
     "jianzhou_threat": 60,
     "history": []
@@ -90,3 +100,25 @@ def save_state(state):
             json.dump(state, f, ensure_ascii=False, indent=2)
         finally:
             _unlock_file(f)
+
+def create_save_slot(slot_id: str):
+    """创建存档"""
+    save_path = os.path.join(SAVES_DIR, f"save_{slot_id}.json")
+    if os.path.exists(STATE_FILE):
+        shutil.copyfile(STATE_FILE, save_path)
+    return True
+
+def load_save_slot(slot_id: str):
+    """读取存档（回档）"""
+    save_path = os.path.join(SAVES_DIR, f"save_{slot_id}.json")
+    if os.path.exists(save_path):
+        shutil.copyfile(save_path, STATE_FILE)
+        return True
+    return False
+
+def list_saves():
+    saves = []
+    for f in os.listdir(SAVES_DIR):
+        if f.startswith("save_") and f.endswith(".json"):
+            saves.append(f.replace("save_", "").replace(".json", ""))
+    return saves
